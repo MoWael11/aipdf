@@ -28,6 +28,9 @@ export function constructMetadate({
   return {
     title,
     description,
+    verification: {
+      google: 'qy9XIF09M46fU-VZvEXeaichv6mQjdhJ2UMypKoDi5M',
+    },
     openGraph: {
       title,
       description,
