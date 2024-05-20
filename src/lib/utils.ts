@@ -41,7 +41,7 @@ export function constructMetadate({
       creator: '@mowael11',
     },
     icons,
-    metadataBase: new URL('http://localhost:3000'),
+    metadataBase: new URL(process.env.BASE_URL),
     // themeColor: '#ffffff', deprecated
     ...(noIndex && {
       robots: {

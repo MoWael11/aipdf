@@ -25,10 +25,10 @@ export async function POST(request: Request) {
 
   if (event.type === 'checkout.session.completed') {
     const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
-
     await db.user.update({
       where: { id: session.metadata.userId },
       data: {
+        credits: { increment: 200 },
         stripeSubscriptionId: subscription.id,
         stripeCustomerId: subscription.customer as string,
         stripePriceId: subscription.items.data[0]?.price.id,
@@ -40,6 +40,7 @@ export async function POST(request: Request) {
   if (event.type === 'invoice.payment_succeeded') {
     // Retrieve the subscription details from Stripe.
     const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
+
     await db.user.update({
       where: { stripeSubscriptionId: subscription.id! },
       data: {

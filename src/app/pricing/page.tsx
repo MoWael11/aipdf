@@ -6,7 +6,7 @@ import { PLANS } from '@/config/stripe'
 import { getUserSubscriptionPlan } from '@/lib/stripe'
 import { cn } from '@/lib/utils'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
-import { ArrowRight, Check, HelpCircle, Minus } from 'lucide-react'
+import { ArrowRight, Check, HelpCircle, Minus, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 
 const Page = async () => {
@@ -19,8 +19,12 @@ const Page = async () => {
     {
       plan: 'Free',
       tagline: 'For small side projects.',
-      quota: 10,
+      quota: PLANS.find((p) => p.slug == 'free')!.quota,
       features: [
+        {
+          text: '20 AI credits at sign up',
+          ai: true,
+        },
         {
           text: '5 pages per PDF',
           footnote: 'The maximum amount of pages per PDF-file.',
@@ -44,6 +48,7 @@ const Page = async () => {
       tagline: 'For larger projects with higher needs.',
       quota: PLANS.find((p) => p.slug === 'pro')!.quota,
       features: [
+        { text: '200 AI credits per month', ai: true },
         {
           text: '25 pages per PDF',
           footnote: 'The maximum amount of pages per PDF-file.',
@@ -57,7 +62,7 @@ const Page = async () => {
         },
         {
           text: 'Higher-quality responses',
-          footnote: 'Better algorithmic responses for enhanced content quality',
+          footnote: 'Better algorithmic responses for enhanced content quality.',
         },
       ],
     },
@@ -100,25 +105,27 @@ const Page = async () => {
 
                   <div className='flex h-20 items-center justify-center border-b border-t border-gray-200 bg-gray-50'>
                     <div className='flex items-center space-x-1'>
-                      <p>{quota.toLocaleString()} PDFs/mo included</p>
+                      <p>{quota.toLocaleString()} PDFs included</p>
 
                       <Tooltip delayDuration={300}>
                         <TooltipTrigger className='cursor-default ml-1.5'>
                           <HelpCircle className='h-4 w-4 text-zinc-500' />
                         </TooltipTrigger>
-                        <TooltipContent className='w-80 p-2'>How many PDFs you can upload per month.</TooltipContent>
+                        <TooltipContent className='w-80 p-2'>How many PDFs you can upload.</TooltipContent>
                       </Tooltip>
                     </div>
                   </div>
 
                   <ul className='my-10 space-y-5 px-8'>
-                    {features.map(({ text, footnote, negative }) => (
+                    {features.map(({ text, footnote, negative, ai }) => (
                       <li key={text} className='flex space-x-5'>
                         <div className='flex-shrink-0'>
                           {negative ? (
                             <Minus className='h-6 w-6 text-gray-300' />
-                          ) : (
+                          ) : !ai ? (
                             <Check className='h-6 w-6 text-blue-500' />
+                          ) : (
+                            <Sparkles className='h-5 w-5 ml-1 text-blue-500' />
                           )}
                         </div>
                         {footnote ? (

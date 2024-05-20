@@ -7,8 +7,11 @@ import { ChevronLeft, Loader2, XCircle } from 'lucide-react'
 import Link from 'next/link'
 import { buttonVariants } from '../ui/button'
 import { ChatContextProvider } from './ChatContext'
+import { useCredits } from '../useCredits'
 
 export const ChatWrapper = ({ fileId }: { fileId: string }) => {
+  const { credits } = useCredits()
+
   const { data, isLoading } = trpc.getFileUploadStatus.useQuery(
     {
       fileId,
@@ -74,7 +77,7 @@ export const ChatWrapper = ({ fileId }: { fileId: string }) => {
         <div className='flex-1 justify-between flex flex-col mb-28'>
           <Messages fileId={fileId} />
         </div>
-        <ChatInput isDisabled={false} />
+        <ChatInput isDisabled={credits && credits > 0 ? false : true} />
       </div>
     </ChatContextProvider>
   )

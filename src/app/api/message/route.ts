@@ -22,9 +22,15 @@ export const POST = async (req: NextRequest) => {
 
   const { id: userId } = user
 
+  const dbUser = await db.user.findUnique({ where: { id: userId } })
+
+  if (!dbUser) return new Response('Unauthorized', { status: 401 })
+
+  if (dbUser.credits < 1) return new Response('Insufficient credits', { status: 400 })
+
   const { fileId, message } = SendMessageValidator.parse(body)
 
-  const file = await db.file.findUnique({ where: { id: fileId, userId } })
+  const file = await db.file.findUnique({ where: { id: fileId, userId, uploadStatus: 'SUCCESS' } })
 
   if (!file) return new Response('Not found', { status: 404 })
 
@@ -100,6 +106,13 @@ export const POST = async (req: NextRequest) => {
     USER INPUT: ${message}`,
         },
       ],
+    })
+
+    await db.user.update({
+      where: { id: userId },
+      data: {
+        credits: { decrement: 1 },
+      },
     })
 
     const stream = OpenAIStream(response, {

@@ -13,10 +13,18 @@ const f = createUploadthing()
 const middleware = async () => {
   const { getUser } = getKindeServerSession()
   const user = await getUser()
-
   if (!user || !user.id) throw new Error('Unauthorized')
 
+  const dbUser = await db.user.findUnique({ where: { id: user.id } })
+
+  if (!dbUser) throw new Error('Unauthorized')
+  if (dbUser.credits < 2) throw new Error('Insufficient credits')
+
+  const userFiles = await db.file.findMany({ where: { userId: user.id } })
+
   const subscriptionPlan = await getUserSubscriptionPlan()
+
+  if (userFiles.length >= subscriptionPlan.quota!) throw new Error('File limit exceeded')
 
   return { userId: user.id, subscriptionPlan }
 }
@@ -67,10 +75,12 @@ const onUploadComplete = async ({
         data: { uploadStatus: 'FAILED' },
         where: { id: createdFile.id },
       })
+
+      return
     }
 
     // vectorize and index entire document
-    const pineconeIndex = pinecone.index('aipdf')
+    const pineconeIndex = pinecone.Index('aipdf')
 
     const embeddings = new OpenAIEmbeddings({
       openAIApiKey: process.env.OPENAI_API_KEY,
@@ -81,6 +91,11 @@ const onUploadComplete = async ({
       pineconeIndex,
       namespace: createdFile.id,
     }) // the "embidings" to tell langchain to generate the voctors from the text using ai model
+
+    await db.user.update({
+      where: { id: metadata.userId },
+      data: { credits: { decrement: 2 } },
+    })
 
     await db.file.update({
       where: { id: createdFile.id },

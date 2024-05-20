@@ -3,6 +3,7 @@ import { useToast } from '../ui/use-toast'
 import { useMutation } from '@tanstack/react-query'
 import { trpc } from '@/app/_trpc/client'
 import { INFINITE_QUERY_LIMIT } from '@/config/infinit-query'
+import { useCredits } from '../useCredits'
 
 type StreamResponse = {
   addMessage: () => void
@@ -26,6 +27,7 @@ interface Props {
 export const ChatContextProvider = ({ fileId, children }: Props) => {
   const [message, setMessage] = useState<string>('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { setCredits, credits } = useCredits()
 
   const backupMessage = useRef('')
 
@@ -35,6 +37,8 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
 
   const { mutate: sendMessage } = useMutation({
     mutationFn: async ({ message }: { message: string }) => {
+      if (!credits || credits < 1) throw new Error('You do not have enough credits')
+
       const response = await fetch('/api/message', {
         method: 'POST',
         body: JSON.stringify({
@@ -87,9 +91,13 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
         previousMessages: previousMessages?.pages.flatMap((page) => page.messages) ?? [],
       }
     },
-    onError: (_, __, context) => {
-      setMessage(backupMessage.current)
+    onError: (err, _, context) => {
       utils.getFileMessages.setData({ fileId }, { messages: context?.previousMessages ?? [] })
+      toast({
+        title: err.message,
+        variant: 'destructive',
+      })
+      setIsLoading(false)
     },
     // after res ended
     onSettled: async () => {
@@ -172,6 +180,8 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
           }
         )
       }
+
+      credits && setCredits(credits - 1)
     },
   })
 

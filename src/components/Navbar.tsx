@@ -1,14 +1,21 @@
-import Link from 'next/link'
-import MaxWidthWrapper from './MaxWidthWrapper'
-import { buttonVariants } from './ui/button'
+import { db } from '@/db'
 import { LoginLink, RegisterLink, getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
 import { ArrowRight } from 'lucide-react'
-import UserAccountNav from './UserAccountNav'
+import Link from 'next/link'
+import CreditsButton from './CreditsButton'
+import MaxWidthWrapper from './MaxWidthWrapper'
 import MobileNav from './MobileNav'
+import UserAccountNav from './UserAccountNav'
+import { buttonVariants } from './ui/button'
+import { getUserSubscriptionPlan } from '@/lib/stripe'
 
 const Navbar = async () => {
   const { getUser } = getKindeServerSession()
   const user = await getUser()
+  let dbUser = null
+  if (user) dbUser = await db.user.findUnique({ where: { id: user.id } })
+
+  const subscriptionPlan = await getUserSubscriptionPlan()
 
   return (
     <nav className='sticky h-14 inset-x-0 top-0 z-30 w-full border-b border-gray-200 bg-white/75 backdrop-blur-lg transition-all'>
@@ -20,7 +27,7 @@ const Navbar = async () => {
 
           <MobileNav isAuth={!!user} />
           <div className='hidden items-center space-x-4 sm:flex'>
-            {!user ? (
+            {!user || !dbUser ? (
               <>
                 <Link className={buttonVariants({ variant: 'ghost', size: 'sm' })} href={'/pricing'}>
                   Pricing
@@ -32,9 +39,7 @@ const Navbar = async () => {
               </>
             ) : (
               <>
-                <Link className={buttonVariants({ variant: 'ghost', size: 'sm' })} href={'/dashboard'}>
-                  Dashboard
-                </Link>
+                <CreditsButton isPro={subscriptionPlan.isSubscribed} />
                 <UserAccountNav
                   email={user.email ?? ''}
                   imageUrl={user.picture ?? ''}

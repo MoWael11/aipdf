@@ -42,7 +42,7 @@ export async function getUserSubscriptionPlan() {
       dbUser.stripeCurrentPeriodEnd.getTime() + 86_400_000 > Date.now() //  grace period + 1 day
   )
 
-  const plan = isSubscribed ? PLANS.find((plan) => plan.price.priceIds.test === dbUser.stripePriceId) : PLANS[0]
+  const plan = isSubscribed ? PLANS.find((plan) => plan.price.priceIds.production === dbUser.stripePriceId) : PLANS[0]
 
   let isCanceled = false
 

@@ -17,6 +17,8 @@ model User {
   files    File[]
   messages Message[]
 
+  credits Int @default(20)
+
   stripeCustomerId       String?   @unique @map("stripe_customre_id")
   stripeSubscriptionId   String?   @unique @map("stripe_subscription_id")
   stripePriceId          String?   @map("stripe_price_id")

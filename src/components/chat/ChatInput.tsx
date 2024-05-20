@@ -1,9 +1,9 @@
 'use client'
 
-import { Send } from 'lucide-react'
+import { Banknote, Coins, Send } from 'lucide-react'
+import { useContext, useRef } from 'react'
 import { Button } from '../ui/button'
 import { Textarea } from '../ui/textarea'
-import { useContext, useRef } from 'react'
 import { ChatContext } from './ChatContext'
 
 const ChatInput = ({ isDisabled }: { isDisabled: boolean }) => {
@@ -37,7 +37,7 @@ const ChatInput = ({ isDisabled }: { isDisabled: boolean }) => {
               <Button
                 disabled={isLoading || isDisabled}
                 aria-label='send message'
-                className='absolute bottom-1.5 right-2'
+                className='absolute bottom-1.5 right-2 gap-1'
                 onClick={() => {
                   addMessage()
 
@@ -45,6 +45,10 @@ const ChatInput = ({ isDisabled }: { isDisabled: boolean }) => {
                   textareaRef.current?.focus()
                 }}
               >
+                <div className='text-xs flex items-center font-mono bg-[#dbd9e04f] py-[1px] px-0.5 rounded-sm'>
+                  <span>1</span>
+                  <Banknote size={12} className='rotate-[233deg]' />
+                </div>
                 <Send className='h-4 w-4' />
               </Button>
             </div>

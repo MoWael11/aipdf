@@ -58,6 +58,13 @@ export const appRouter = router({
 
     return file
   }),
+  getCredits: privateProcedure.query(async ({ ctx }) => {
+    const { userId } = ctx
+    const dbUser = await db.user.findUnique({ where: { id: userId } })
+
+    if (!dbUser) throw new TRPCError({ code: 'NOT_FOUND' })
+    return { credits: dbUser.credits }
+  }),
   getFileMessages: privateProcedure
     .input(
       z.object({
@@ -106,8 +113,6 @@ export const appRouter = router({
 
     const subscriptionPlan = await getUserSubscriptionPlan()
 
-    console.log('SUBSCRIPTION PLAN', subscriptionPlan)
-
     if (subscriptionPlan.isSubscribed && dbUser.stripeCustomerId) {
       try {
         const stripSession = await stripe.billingPortal.sessions.create({
@@ -130,7 +135,7 @@ export const appRouter = router({
         payment_method_types: ['card'],
         mode: 'subscription',
         billing_address_collection: 'auto',
-        line_items: [{ price: PLANS.find((p) => p.name === 'Pro')!.price.priceIds.test, quantity: 1 }], // price id
+        line_items: [{ price: PLANS.find((p) => p.name === 'Pro')!.price.priceIds.production, quantity: 1 }], // price id
         metadata: { userId },
       })
 
