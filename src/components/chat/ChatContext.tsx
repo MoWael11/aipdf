@@ -59,18 +59,11 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
 
       // step 3 - insert new value
       utils.getFileMessages.setInfiniteData({ fileId, limit: INFINITE_QUERY_LIMIT }, (old) => {
-        console.log(!old)
-        console.log(old)
-        console.log(message)
-
         if (!old) return { pages: [], pageParams: [] }
 
         let newPages = [...old.pages]
 
         let latestPage = newPages[0]! // this cause the order is desc in the trpc method
-        console.log(newPages[0])
-        console.log(latestPage.messages)
-
         latestPage.messages = [
           // insert the current message
           {
@@ -81,11 +74,7 @@ export const ChatContextProvider = ({ fileId, children }: Props) => {
           },
           ...latestPage.messages, // add the previous messages
         ]
-        console.log(latestPage.messages)
-
         newPages[0] = latestPage // to put the new message
-        console.log(newPages[0])
-
         return {
           ...old,
           pages: newPages,

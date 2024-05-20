@@ -45,7 +45,7 @@ export const POST = async (req: NextRequest) => {
       openAIApiKey: process.env.OPENAI_API_KEY,
     })
 
-    const pineconeIndex = pinecone.Index('aipdf')
+    const pineconeIndex = pinecone.index('aipdf')
 
     const vectorStore = await PineconeStore.fromExistingIndex(embeddings, {
       //@ts-ignore
@@ -117,6 +117,8 @@ export const POST = async (req: NextRequest) => {
 
     return new StreamingTextResponse(stream)
   } catch (err) {
+    console.log(err)
+
     // skipping ai part on 429 error state from openai
     const AIRes = 'Sorry, I am unable to answer at the moment.'
     await db.message.create({

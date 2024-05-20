@@ -70,7 +70,7 @@ const onUploadComplete = async ({
     }
 
     // vectorize and index entire document
-    const pineconeIndex = pinecone.Index('aipdf')
+    const pineconeIndex = pinecone.index('aipdf')
 
     const embeddings = new OpenAIEmbeddings({
       openAIApiKey: process.env.OPENAI_API_KEY,

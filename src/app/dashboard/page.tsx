@@ -8,9 +8,9 @@ const Page = async () => {
   const { getUser } = getKindeServerSession()
   const user = await getUser()
 
-  const susbscriptionPlan = await getUserSubscriptionPlan()
+  if (!user || !user.id) redirect('/api/auth/login')
 
-  if (!user || !user.id) redirect('/auth-callback?origin=dashboard')
+  const susbscriptionPlan = await getUserSubscriptionPlan()
 
   const dbUser = await db.user.findUnique({
     where: {

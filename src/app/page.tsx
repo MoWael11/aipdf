@@ -3,6 +3,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { LoginLink } from '@kinde-oss/kinde-auth-nextjs/server'
 
 export default function Home() {
   return (
@@ -18,9 +19,9 @@ export default function Home() {
           AiPDF allows you to have conversations with any PDF document. Simply upload your file and start a conversation
         </p>
 
-        <Link className={buttonVariants({ size: 'lg', className: 'mt-5' })} href={'/dashboard'} target='_blank'>
+        <LoginLink className={buttonVariants({ size: 'lg', className: 'mt-5' })} target='_blank'>
           Get started <ArrowRight className='ml-2 h-5 w-5' />
-        </Link>
+        </LoginLink>
       </MaxWidthWrapper>
 
       {/* value proposition section */}

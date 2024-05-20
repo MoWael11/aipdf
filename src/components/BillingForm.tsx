@@ -8,6 +8,7 @@ import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/c
 import { Button } from './ui/button'
 import { Loader2 } from 'lucide-react'
 import moment from 'moment'
+import { useRouter } from 'next/navigation'
 
 interface BillingFormProps {
   subscriptionPlan: Awaited<ReturnType<typeof getUserSubscriptionPlan>> // await a promise type
@@ -15,17 +16,19 @@ interface BillingFormProps {
 
 const BillingForm = ({ subscriptionPlan }: BillingFormProps) => {
   const { toast } = useToast()
-
-  console.log(subscriptionPlan)
+  const { push } = useRouter()
 
   const { mutate: createStripeSession, isPending } = trpc.createStripeSession.useMutation({
     onSuccess: ({ url }) => {
-      if (!url)
+      if (!url) {
         toast({
           title: 'There was a problem',
-          description: 'Please tty again in a moment',
+          description: 'Please try again in a moment',
           variant: 'destructive',
         })
+        return
+      }
+      push(url)
     },
   })
 
@@ -53,8 +56,8 @@ const BillingForm = ({ subscriptionPlan }: BillingFormProps) => {
 
             {subscriptionPlan.isSubscribed ? (
               <p className='rounded-full text-xs font-medium'>
-                {subscriptionPlan.isCanceled ? 'Your plan will be canceled on' : 'Your plan renews on'}
-                {moment(subscriptionPlan.stripeCurrentPeriodEnd!).format('dd.MM.yyyy')}.
+                {subscriptionPlan.isCanceled ? 'Your plan will be canceled on ' : 'Your plan renews on '}
+                {moment(subscriptionPlan.stripeCurrentPeriodEnd!).format('DD.MM.yyyy')}.
               </p>
             ) : null}
           </CardFooter>

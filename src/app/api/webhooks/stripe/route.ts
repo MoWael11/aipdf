@@ -32,7 +32,7 @@ export async function POST(request: Request) {
         stripeSubscriptionId: subscription.id,
         stripeCustomerId: subscription.customer as string,
         stripePriceId: subscription.items.data[0]?.price.id,
-        stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000), // unix time stample converting from seconds to milliseconds
       },
     })
   }
@@ -40,7 +40,6 @@ export async function POST(request: Request) {
   if (event.type === 'invoice.payment_succeeded') {
     // Retrieve the subscription details from Stripe.
     const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
-
     await db.user.update({
       where: { stripeSubscriptionId: subscription.id! },
       data: {
