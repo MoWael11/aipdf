@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /sign-up
+Disallow: /dashboard
+Disallow: /sign-in
+Disallow: /auth-callback
+
+Sitemap: https://aipdf.mowael.com/sitemap.xml
